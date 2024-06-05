@@ -1,7 +1,7 @@
 <script setup></script>
 
 <template>
-  <router-view></router-view>
+  <div>文章频道项</div>
 </template>
 
 <style scoped lang="less"></style>

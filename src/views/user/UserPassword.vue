@@ -1,7 +1,7 @@
 <script setup></script>
 
 <template>
-  <router-view></router-view>
+  <div>重置密码</div>
 </template>
 
 <style scoped lang="less"></style>

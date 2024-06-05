@@ -1,7 +1,7 @@
 <script setup></script>
 
 <template>
-  <router-view></router-view>
+  <h1>登录</h1>
 </template>
 
 <style scoped lang="less"></style>
