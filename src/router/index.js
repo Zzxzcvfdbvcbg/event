@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useUserStore } from '@/stores'
 
 // createRouter创建路由实例
 // history和hash模式的区别：有没有#号
@@ -35,6 +36,19 @@ const router = createRouter({
       ]
     }
   ]
+})
+
+router.beforeEach(async (to) => {
+  const userStore = useUserStore()
+  if (
+    // 检查用户是否已登录
+    !userStore.token &&
+    // ❗️ 避免无限重定向
+    to.path !== '/login'
+  ) {
+    // 将用户重定向到登录页面
+    return '/login'
+  }
 })
 
 export default router
