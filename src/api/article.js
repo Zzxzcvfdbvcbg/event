@@ -33,3 +33,18 @@ export const articleDelService = (id) => {
     params: { id }
   })
 }
+
+// 获取文章列表
+export const articleGetListService = (params) => {
+  return request({
+    method: 'GET',
+    url: 'my/article/list',
+    params
+  })
+}
+
+// 发布文章
+export const artPublishService = (data) => request.post('/my/article/add', data)
+// 获取文章详情
+export const artGetDetailService = (id) =>
+  request.get('my/article/info', { params: { id } })

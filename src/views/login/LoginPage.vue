@@ -4,7 +4,7 @@ import { User, Lock } from '@element-plus/icons-vue'
 import { ref, watch } from 'vue'
 import { useUserStore } from '@/stores'
 import { useRouter } from 'vue-router'
-const isRegister = ref(true)
+const isRegister = ref(false)
 // 整个的用于提交form数据对象
 const formModel = ref({
   username: '',
