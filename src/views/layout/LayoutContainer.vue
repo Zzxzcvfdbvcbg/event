@@ -112,7 +112,7 @@ const onCommand = async (key) => {
           </el-dropdown>
         </el-header>
         <el-main><router-view></router-view></el-main>
-        <el-footer>大事件 ©2023 Created by 橘橘罗伊</el-footer>
+        <el-footer>大事件 ©2024 Created by 橘橘罗伊</el-footer>
       </el-container>
     </el-main>
   </el-container>

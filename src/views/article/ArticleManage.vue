@@ -2,9 +2,9 @@
 import articleHead from '@/components/article-head.vue'
 import { Edit, Delete } from '@element-plus/icons-vue'
 import { ref } from 'vue'
-import { articleGetListService } from '@/api/article'
+import { articleGetListService, artDelService } from '@/api/article' //获取文章详情
 import ChannelSelete from './components/ChannelSelete.vue'
-import { formatTime } from '@/utils/format'
+import { formatTime } from '@/utils/format' //规范化时间
 import ArticleEdit from './components/ArticleEdit.vue'
 const loading = ref(false)
 const params = ref({
@@ -28,13 +28,14 @@ artGetList()
 
 // 处理分页
 const handleSizeChange = (size) => {
-  console.log('当前每页条数变化了', size)
+  // console.log('当前每页条数变化了', size)
+  // 重新从第一页渲染即可
   params.value.pagenum = 1
   params.value.pagesize = size
   artGetList()
 }
 const handleCurrentChange = (page) => {
-  console.log('页码变化了', page)
+  // console.log('页码变化了', page)
   params.value.pagenum = page
   artGetList()
 }
@@ -53,18 +54,27 @@ const onReset = () => {
 }
 
 const articleEditRef = ref()
-// 发布
+// 有id则是编辑文章没有则是发布文章
+// 发布文章
 const onAddArticle = () => {
   articleEditRef.value.open({})
 }
-// 编辑
+// 编辑文章
 const onEditArt = (row) => {
   // console.log(row)
   articleEditRef.value.open(row)
 }
 // 删除
-const onDelArt = (row) => {
-  console.log(row)
+const onDelArt = async (row) => {
+  // console.log(row)
+  await ElMessageBox.confirm('你确认删除该文章信息吗？', '温馨提示', {
+    type: 'warning',
+    confirmButtonText: '确认',
+    cancelButtonText: '取消'
+  })
+  await artDelService(row.id)
+  ElMessage({ type: 'success', message: '删除成功' })
+  artGetList()
 }
 // 添加修改成功
 const onSuccess = (type) => {
@@ -82,14 +92,15 @@ const onSuccess = (type) => {
     <template #extra>
       <el-button type="primary" @click="onAddArticle">发布文章</el-button>
     </template>
+    <!-- 表单区域 -->
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
       <el-form-item label="文章分类">
         <channel-selete v-model="params.cate_id"></channel-selete>
       </el-form-item>
       <el-form-item label="发布状态" v-model="params.state">
         <el-select placeholder="请选择" clearable style="width: 120px">
-          <el-option label="已发布" value="shanghai" />
-          <el-option label="草稿" value="beijing" />
+          <el-option label="已发布" value="fabu" />
+          <el-option label="草稿" value="caogao" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -97,7 +108,7 @@ const onSuccess = (type) => {
         <el-button @click="onReset">重置</el-button>
       </el-form-item>
     </el-form>
-
+    <!-- 表格区域 -->
     <el-table :data="articleList" style="width: 100%" v-loading="loading">
       <el-table-column prop="title" label="文章标题">
         <template #default="{ row }">
@@ -136,13 +147,13 @@ const onSuccess = (type) => {
       v-model:page-size="params.pagesize"
       :page-sizes="[2, 3, 5, 7]"
       :background="true"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="400"
+      layout="jumper,total, sizes, prev, pager, next"
+      :total="total"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
       style="margin-top: 20px; justify-content: flex-end"
     />
-
+    <!-- 封装的抽屉 -->
     <article-edit ref="articleEditRef" @success="onSuccess"></article-edit>
   </articleHead>
 </template>
