@@ -148,9 +148,15 @@ onMounted(async () => {
         <channel-selete v-model="params.cate_id"></channel-selete>
       </el-form-item>
       <el-form-item label="发布状态" v-model="params.state">
-        <el-select placeholder="请选择" clearable style="width: 120px">
-          <el-option label="已发布" value="fabu" />
-          <el-option label="草稿" value="caogao" />
+        <!-- label展示给用户看 ，value展示给后台-->
+        <el-select
+          v-model="params.state"
+          placeholder="请选择"
+          clearable
+          style="width: 120px"
+        >
+          <el-option label="已发布" value="已发布" />
+          <el-option label="草稿" value="草稿" />
         </el-select>
       </el-form-item>
       <el-form-item>
