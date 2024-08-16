@@ -1,11 +1,12 @@
 <script setup>
 import articleHead from '@/components/article-head.vue'
 import { Edit, Delete } from '@element-plus/icons-vue'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { articleGetListService, artDelService } from '@/api/article' //获取文章详情
 import ChannelSelete from './components/ChannelSelete.vue'
 import { formatTime } from '@/utils/format' //规范化时间
 import ArticleEdit from './components/ArticleEdit.vue'
+import * as echarts from 'echarts' //引入echarts的核心模块
 const loading = ref(false)
 const params = ref({
   pagenum: 1, //当前页码数
@@ -19,12 +20,12 @@ const total = ref(0)
 const artGetList = async () => {
   loading.value = true
   const res = await articleGetListService(params.value)
-  // console.log(res)
+  // console.log(res.data.data)
   articleList.value = res.data.data
   total.value = res.data.total
   loading.value = false
 }
-artGetList()
+// artGetList()
 
 // 处理分页
 const handleSizeChange = (size) => {
@@ -85,6 +86,55 @@ const onSuccess = (type) => {
   }
   artGetList()
 }
+const chartDom = ref()
+
+function chartInit() {
+  // 基于准备好的dom，初始化echarts实例
+  var myChart = echarts.init(chartDom.value)
+  console.log(total.value)
+  console.log(articleList.value)
+  // 格式化所有文章的发布日期
+  const formattedDates = articleList.value.map((item) =>
+    formatTime(new Date(item.pub_date))
+  )
+
+  // 统计每个日期的文章个数
+  const articleCounts = formattedDates.reduce((counts, date) => {
+    if (counts[date]) {
+      counts[date]++
+    } else {
+      counts[date] = 1
+    }
+    return counts
+  }, {})
+  // 准备 xAxis 和 series 的数据
+  const xAxisData = Object.keys(articleCounts).sort() // 获取所有唯一的日期并排序
+  const seriesData = xAxisData.map((date) => articleCounts[date]) // 根据日期映射获取文章数
+
+  // 指定图表的配置项和数据
+  var option = {
+    xAxis: {
+      type: 'category',
+      data: xAxisData
+    },
+    yAxis: {
+      type: 'value'
+    },
+    series: [
+      {
+        data: seriesData,
+        type: 'line'
+      }
+    ]
+  }
+
+  // 使用刚指定的配置项和数据显示图表。
+  myChart.setOption(option)
+}
+onMounted(async () => {
+  await artGetList() // 确保数据已加载
+  chartInit()
+})
 </script>
 
 <template>
@@ -118,7 +168,7 @@ const onSuccess = (type) => {
       <el-table-column prop="cate_name" label="分类" />
       <el-table-column prop="pub_date " label="发表时间">
         <template #default="{ row }">
-          {{ formatTime(row.pubdate) }}
+          {{ formatTime(row.pub_date) }}
         </template>
       </el-table-column>
       <el-table-column prop="state" label="状态" />
@@ -155,6 +205,9 @@ const onSuccess = (type) => {
     />
     <!-- 封装的抽屉 -->
     <article-edit ref="articleEditRef" @success="onSuccess"></article-edit>
+  </articleHead>
+  <articleHead title="统计管理">
+    <div ref="chartDom" style="width: 100%; height: 400px"></div>
   </articleHead>
 </template>
 
